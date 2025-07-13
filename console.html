@@ -1,0 +1,275 @@
+<!-- XTerm.js CSS -->
+<link rel="stylesheet" href="/xterm/css/xterm.css">
+
+<!-- Terminal Container with proper overflow handling -->
+<div id="xterm-container"
+    style="width: 100%; height: 100%; background: #1e1e1e; border-radius: 4px; position: relative; overflow: hidden;">
+    <div id="terminal" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></div>
+</div>
+
+<script>
+    (function(scope) {
+    // Wait for xterm.js to load
+    let terminal = null;
+    
+    function initializeTerminal() {
+        // Check if Terminal is available
+        if (typeof Terminal === 'undefined') {
+            setTimeout(initializeTerminal, 100);
+            return;
+        }
+        
+        // Create terminal with theme and fonts
+        terminal = new Terminal({
+            fontFamily: '"JetBrains Mono", "Fira Code", "Consolas", "Monaco", monospace',
+            fontSize: 13,
+            fontWeight: 'normal',
+            cursorBlink: true,
+            scrollback: 1000,        // Keep 1000 lines in history
+            allowTransparency: false,
+            theme: {
+                background: '#1e1e1e',
+                foreground: '#d4d4d4',
+                cursor: '#f0f0f0',
+                cursorAccent: '#1e1e1e',
+                selection: '#264f78',
+                black: '#000000',
+                red: '#f48771',
+                green: '#90c695',
+                yellow: '#f9c74f',
+                blue: '#85c1f9',
+                magenta: '#f2a2e8',
+                cyan: '#85e9f2',
+                white: '#d4d4d4',
+                brightBlack: '#6e7681',
+                brightRed: '#ff8a80',
+                brightGreen: '#b8e994',
+                brightYellow: '#ffd93d',
+                brightBlue: '#6eb5ff',
+                brightMagenta: '#ff8a95',
+                brightCyan: '#a2f0fc',
+                brightWhite: '#ffffff'
+            }
+        });
+        
+        // Open terminal
+        const terminalElement = document.getElementById('terminal');
+        if (terminalElement && !terminalElement.hasChildNodes()) {
+            terminal.open(terminalElement);
+            
+            // Enable scrolling and auto-scroll to bottom
+            terminal.scrollToBottom();
+            
+            // Welcome message
+            terminal.writeln('Waiting for messages ...');
+            terminal.writeln('');
+            
+            // Force scroll to bottom after initial setup
+            setTimeout(() => {
+                terminal.scrollToBottom();
+            }, 100);
+        }
+        
+        // Auto-resize functionality
+        resizeTerminal();
+    }
+    
+    function resizeTerminal() {
+        if (!terminal) return;
+        
+        setTimeout(() => {
+            const container = document.getElementById('xterm-container');
+            if (container) {
+                const rect = container.getBoundingClientRect();
+                
+                // More accurate character measurements for different font sizes
+                const charWidth = Math.ceil(terminal.options.fontSize * 0.6);  // Approximate char width
+                const lineHeight = Math.ceil(terminal.options.fontSize * 1.2); // Approximate line height
+                
+                // Calculate based on actual container size
+                const cols = Math.floor(rect.width / charWidth);
+                const rows = Math.floor(rect.height / lineHeight);
+                
+                // Ensure minimum size and avoid invalid dimensions
+                const finalCols = Math.max(cols, 10);
+                const finalRows = Math.max(rows, 3);
+                
+                // Only resize if dimensions actually changed
+                if (terminal.cols !== finalCols || terminal.rows !== finalRows) {
+                    terminal.resize(finalCols, finalRows);
+                    console.log(`Terminal resized to ${finalCols}x${finalRows} (container: ${Math.round(rect.width)}x${Math.round(rect.height)})`);
+                }
+            }
+        }, 100);
+    }
+    
+    // Terminal state management
+    let terminalState = {
+        showTimestamp: true,  // Default timestamp behavior
+        showLevels: true      // Default level display behavior
+    };
+    
+    // Function to format payload like Node-RED debug node
+    function formatPayload(payload) {
+        if (payload === null) return 'null';
+        if (payload === undefined) return 'undefined';
+        if (typeof payload === 'string') return payload;
+        if (typeof payload === 'number') return payload.toString();
+        if (typeof payload === 'boolean') return payload.toString();
+        
+        // For objects and arrays, format like debug node with proper line breaks
+        try {
+            if (typeof payload === 'object') {
+                let jsonStr;
+                if (Array.isArray(payload)) {
+                    const header = `array[${payload.length}]:`;
+                    jsonStr = JSON.stringify(payload, null, 2);
+                } else {
+                    const keys = Object.keys(payload);
+                    const header = `object[${keys.length}]:`;
+                    jsonStr = JSON.stringify(payload, null, 2);
+                }
+                
+                // Replace \n with \r\n for proper xterm.js display
+                jsonStr = jsonStr.replace(/\n/g, '\r\n');
+                
+                // For single-line simple objects/arrays, keep them compact
+                if (JSON.stringify(payload).length < 60) {
+                    return JSON.stringify(payload);
+                }
+                
+                return jsonStr;
+            }
+            return JSON.stringify(payload, null, 2).replace(/\n/g, '\r\n');
+        } catch (e) {
+            return payload.toString();
+        }
+    }
+    
+    // Function to write multi-line content properly
+    function writeToTerminal(content, colorCode) {
+        const lines = content.split('\r\n');
+        
+        terminal.write(colorCode); // Set color
+        
+        if (lines.length === 1) {
+            // Single line - use writeln
+            terminal.writeln(content);
+        } else {
+            // Multi-line - write each line separately
+            lines.forEach((line, index) => {
+                if (index === lines.length - 1 && line === '') {
+                    // Skip empty last line
+                    return;
+                }
+                terminal.write(line);
+                if (index < lines.length - 1) {
+                    terminal.write('\r\n'); // Proper line break
+                }
+            });
+            terminal.write('\r\n'); // Final line break
+        }
+        
+        terminal.write('\x1b[0m'); // Reset color
+    }
+    
+    // Watch for messages from Node-RED
+    scope.$watch('msg', function(newMsg) {
+        if (newMsg && terminal) {
+            // Handle timestamp setting (persistent)
+            if (newMsg.hasOwnProperty('timestamp')) {
+                terminalState.showTimestamp = newMsg.timestamp;
+                terminal.write('\x1b[90m'); // Dark gray
+                terminal.writeln(`Timestamp ${terminalState.showTimestamp ? 'enabled' : 'disabled'}`);
+                terminal.write('\x1b[0m');
+                return;
+            }
+            
+            // Handle level visibility setting (persistent)
+            if (newMsg.hasOwnProperty('showLevels')) {
+                terminalState.showLevels = newMsg.showLevels;
+                terminal.write('\x1b[90m'); // Dark gray
+                terminal.writeln(`Level indicators ${terminalState.showLevels ? 'enabled' : 'disabled'}`);
+                terminal.write('\x1b[0m');
+                return;
+            }
+            
+            // Handle clear command
+            if (newMsg.clear) {
+                terminal.clear();
+                terminal.writeln('Terminal cleared');
+                terminal.writeln('');
+                return;
+            }
+            
+            // Check if we have content to display
+            let content = newMsg.xtermconsole || newMsg.payload;
+            if (content !== undefined && content !== null) {
+                const message = formatPayload(content);
+                const timestamp = terminalState.showTimestamp ? `[${new Date().toLocaleTimeString()}] ` : '';
+                
+                // Build level prefix if enabled
+                let levelPrefix = '';
+                if (terminalState.showLevels && newMsg.level) {
+                    levelPrefix = `${newMsg.level.toUpperCase()}: `;
+                }
+                
+                // Build complete message with timestamp and level
+                const fullMessage = `${timestamp}${levelPrefix}${message}`;
+                
+                // Different colors for different message types - use new writeToTerminal function
+                if (newMsg.level === 'error') {
+                    writeToTerminal(fullMessage, '\x1b[31m'); // Red
+                } else if (newMsg.level === 'warn') {
+                    writeToTerminal(fullMessage, '\x1b[33m'); // Yellow
+                } else if (newMsg.level === 'info') {
+                    writeToTerminal(fullMessage, '\x1b[36m'); // Cyan
+                } else if (newMsg.level === 'debug') {
+                    writeToTerminal(fullMessage, '\x1b[35m'); // Magenta
+                } else if (newMsg.level === 'white') {
+                    writeToTerminal(fullMessage, '\x1b[37m'); // White
+                } else {
+                    writeToTerminal(fullMessage, '\x1b[32m'); // Green (default)
+                }
+                
+                // Auto-scroll to bottom after new message
+                terminal.scrollToBottom();
+            }
+        }
+    });
+    
+    // Handle window resize and widget resize
+    window.addEventListener('resize', resizeTerminal);
+    
+    // Watch for widget size changes (Node-RED dashboard specific)
+    const resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+            if (entry.target.id === 'xterm-container') {
+                resizeTerminal();
+            }
+        }
+    });
+    
+    // Observe the container for size changes
+    const container = document.getElementById('xterm-container');
+    if (container) {
+        resizeObserver.observe(container);
+    }
+    
+    // Initial resize when everything is loaded
+    setTimeout(() => {
+        resizeTerminal();
+    }, 200);
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeTerminal);
+    } else {
+        initializeTerminal();
+    }
+    
+})(scope);
+</script>
+
+<!-- Load XTerm.js from your installed npm package -->
+<script src="/xterm/lib/xterm.js"></script>

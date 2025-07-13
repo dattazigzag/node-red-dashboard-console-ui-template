@@ -1,0 +1,521 @@
+[
+    {
+        "id": "8f7421acc8b41242",
+        "type": "tab",
+        "label": "Flow 2",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "c45b1f3c86beaff7",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-custom",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#666666",
+                "baseFont": "Lucida Sans Typewriter,Lucida Console,Monaco,monospace",
+                "reset": false
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#4B7930",
+                    "value": "#666666",
+                    "edited": true
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#111111",
+                    "edited": true
+                },
+                "page-backgroundColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#191919",
+                    "edited": true
+                },
+                "group-textColor": {
+                    "value": "#469daf",
+                    "edited": true
+                },
+                "group-borderColor": {
+                    "value": "#111111",
+                    "edited": true
+                },
+                "group-backgroundColor": {
+                    "value": "#111111",
+                    "edited": true
+                },
+                "widget-textColor": {
+                    "value": "#4f4f4f",
+                    "edited": true
+                },
+                "widget-backgroundColor": {
+                    "value": "#111111",
+                    "edited": true
+                },
+                "widget-borderColor": {
+                    "value": "#111111",
+                    "edited": true
+                },
+                "base-font": {
+                    "value": "Lucida Sans Typewriter,Lucida Console,Monaco,monospace"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "c1c518c11bf2c9a3",
+        "type": "ui_tab",
+        "name": "TEST",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "f94ff999af193317",
+        "type": "ui_group",
+        "name": "CONSOLE",
+        "tab": "c1c518c11bf2c9a3",
+        "order": 1,
+        "disp": true,
+        "width": "10",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "c091688bc3e38506",
+        "type": "ui_template",
+        "z": "8f7421acc8b41242",
+        "group": "f94ff999af193317",
+        "name": "CONSOLE [dashboard UI template]",
+        "order": 0,
+        "width": "10",
+        "height": "5",
+        "format": "<!-- XTerm.js CSS -->\n<link rel=\"stylesheet\" href=\"/xterm/css/xterm.css\">\n\n<!-- Terminal Container with proper overflow handling -->\n<div id=\"xterm-container\"\n    style=\"width: 100%; height: 100%; background: #1e1e1e; border-radius: 4px; position: relative; overflow: hidden;\">\n    <div id=\"terminal\" style=\"width: 100%; height: 100%; position: absolute; top: 0; left: 0;\"></div>\n</div>\n\n<script>\n    (function(scope) {\n    // Wait for xterm.js to load\n    let terminal = null;\n    \n    function initializeTerminal() {\n        // Check if Terminal is available\n        if (typeof Terminal === 'undefined') {\n            setTimeout(initializeTerminal, 100);\n            return;\n        }\n        \n        // Create terminal with theme and fonts\n        terminal = new Terminal({\n            fontFamily: '\"JetBrains Mono\", \"Fira Code\", \"Consolas\", \"Monaco\", monospace',\n            fontSize: 13,\n            fontWeight: 'normal',\n            cursorBlink: true,\n            scrollback: 1000,        // Keep 1000 lines in history\n            allowTransparency: false,\n            theme: {\n                background: '#1e1e1e',\n                foreground: '#d4d4d4',\n                cursor: '#f0f0f0',\n                cursorAccent: '#1e1e1e',\n                selection: '#264f78',\n                black: '#000000',\n                red: '#f48771',\n                green: '#90c695',\n                yellow: '#f9c74f',\n                blue: '#85c1f9',\n                magenta: '#f2a2e8',\n                cyan: '#85e9f2',\n                white: '#d4d4d4',\n                brightBlack: '#6e7681',\n                brightRed: '#ff8a80',\n                brightGreen: '#b8e994',\n                brightYellow: '#ffd93d',\n                brightBlue: '#6eb5ff',\n                brightMagenta: '#ff8a95',\n                brightCyan: '#a2f0fc',\n                brightWhite: '#ffffff'\n            }\n        });\n        \n        // Open terminal\n        const terminalElement = document.getElementById('terminal');\n        if (terminalElement && !terminalElement.hasChildNodes()) {\n            terminal.open(terminalElement);\n            \n            // Enable scrolling and auto-scroll to bottom\n            terminal.scrollToBottom();\n            \n            // Welcome message\n            terminal.writeln('Waiting for messages ...');\n            terminal.writeln('');\n            \n            // Force scroll to bottom after initial setup\n            setTimeout(() => {\n                terminal.scrollToBottom();\n            }, 100);\n        }\n        \n        // Auto-resize functionality\n        resizeTerminal();\n    }\n    \n    function resizeTerminal() {\n        if (!terminal) return;\n        \n        setTimeout(() => {\n            const container = document.getElementById('xterm-container');\n            if (container) {\n                const rect = container.getBoundingClientRect();\n                \n                // More accurate character measurements for different font sizes\n                const charWidth = Math.ceil(terminal.options.fontSize * 0.6);  // Approximate char width\n                const lineHeight = Math.ceil(terminal.options.fontSize * 1.2); // Approximate line height\n                \n                // Calculate based on actual container size\n                const cols = Math.floor(rect.width / charWidth);\n                const rows = Math.floor(rect.height / lineHeight);\n                \n                // Ensure minimum size and avoid invalid dimensions\n                const finalCols = Math.max(cols, 10);\n                const finalRows = Math.max(rows, 3);\n                \n                // Only resize if dimensions actually changed\n                if (terminal.cols !== finalCols || terminal.rows !== finalRows) {\n                    terminal.resize(finalCols, finalRows);\n                    console.log(`Terminal resized to ${finalCols}x${finalRows} (container: ${Math.round(rect.width)}x${Math.round(rect.height)})`);\n                }\n            }\n        }, 100);\n    }\n    \n    // Terminal state management\n    let terminalState = {\n        showTimestamp: true,  // Default timestamp behavior\n        showLevels: true      // Default level display behavior\n    };\n    \n    // Function to format payload like Node-RED debug node\n    function formatPayload(payload) {\n        if (payload === null) return 'null';\n        if (payload === undefined) return 'undefined';\n        if (typeof payload === 'string') return payload;\n        if (typeof payload === 'number') return payload.toString();\n        if (typeof payload === 'boolean') return payload.toString();\n        \n        // For objects and arrays, format like debug node with proper line breaks\n        try {\n            if (typeof payload === 'object') {\n                let jsonStr;\n                if (Array.isArray(payload)) {\n                    const header = `array[${payload.length}]:`;\n                    jsonStr = JSON.stringify(payload, null, 2);\n                } else {\n                    const keys = Object.keys(payload);\n                    const header = `object[${keys.length}]:`;\n                    jsonStr = JSON.stringify(payload, null, 2);\n                }\n                \n                // Replace \\n with \\r\\n for proper xterm.js display\n                jsonStr = jsonStr.replace(/\\n/g, '\\r\\n');\n                \n                // For single-line simple objects/arrays, keep them compact\n                if (JSON.stringify(payload).length < 60) {\n                    return JSON.stringify(payload);\n                }\n                \n                return jsonStr;\n            }\n            return JSON.stringify(payload, null, 2).replace(/\\n/g, '\\r\\n');\n        } catch (e) {\n            return payload.toString();\n        }\n    }\n    \n    // Function to write multi-line content properly\n    function writeToTerminal(content, colorCode) {\n        const lines = content.split('\\r\\n');\n        \n        terminal.write(colorCode); // Set color\n        \n        if (lines.length === 1) {\n            // Single line - use writeln\n            terminal.writeln(content);\n        } else {\n            // Multi-line - write each line separately\n            lines.forEach((line, index) => {\n                if (index === lines.length - 1 && line === '') {\n                    // Skip empty last line\n                    return;\n                }\n                terminal.write(line);\n                if (index < lines.length - 1) {\n                    terminal.write('\\r\\n'); // Proper line break\n                }\n            });\n            terminal.write('\\r\\n'); // Final line break\n        }\n        \n        terminal.write('\\x1b[0m'); // Reset color\n    }\n    \n    // Watch for messages from Node-RED\n    scope.$watch('msg', function(newMsg) {\n        if (newMsg && terminal) {\n            // Handle timestamp setting (persistent)\n            if (newMsg.hasOwnProperty('timestamp')) {\n                terminalState.showTimestamp = newMsg.timestamp;\n                terminal.write('\\x1b[90m'); // Dark gray\n                terminal.writeln(`Timestamp ${terminalState.showTimestamp ? 'enabled' : 'disabled'}`);\n                terminal.write('\\x1b[0m');\n                return;\n            }\n            \n            // Handle level visibility setting (persistent)\n            if (newMsg.hasOwnProperty('showLevels')) {\n                terminalState.showLevels = newMsg.showLevels;\n                terminal.write('\\x1b[90m'); // Dark gray\n                terminal.writeln(`Level indicators ${terminalState.showLevels ? 'enabled' : 'disabled'}`);\n                terminal.write('\\x1b[0m');\n                return;\n            }\n            \n            // Handle clear command\n            if (newMsg.clear) {\n                terminal.clear();\n                terminal.writeln('Terminal cleared');\n                terminal.writeln('');\n                return;\n            }\n            \n            // Check if we have content to display\n            let content = newMsg.xtermconsole || newMsg.payload;\n            if (content !== undefined && content !== null) {\n                const message = formatPayload(content);\n                const timestamp = terminalState.showTimestamp ? `[${new Date().toLocaleTimeString()}] ` : '';\n                \n                // Build level prefix if enabled\n                let levelPrefix = '';\n                if (terminalState.showLevels && newMsg.level) {\n                    levelPrefix = `${newMsg.level.toUpperCase()}: `;\n                }\n                \n                // Build complete message with timestamp and level\n                const fullMessage = `${timestamp}${levelPrefix}${message}`;\n                \n                // Different colors for different message types - use new writeToTerminal function\n                if (newMsg.level === 'error') {\n                    writeToTerminal(fullMessage, '\\x1b[31m'); // Red\n                } else if (newMsg.level === 'warn') {\n                    writeToTerminal(fullMessage, '\\x1b[33m'); // Yellow\n                } else if (newMsg.level === 'info') {\n                    writeToTerminal(fullMessage, '\\x1b[36m'); // Cyan\n                } else if (newMsg.level === 'debug') {\n                    writeToTerminal(fullMessage, '\\x1b[35m'); // Magenta\n                } else if (newMsg.level === 'white') {\n                    writeToTerminal(fullMessage, '\\x1b[37m'); // White\n                } else {\n                    writeToTerminal(fullMessage, '\\x1b[32m'); // Green (default)\n                }\n                \n                // Auto-scroll to bottom after new message\n                terminal.scrollToBottom();\n            }\n        }\n    });\n    \n    // Handle window resize and widget resize\n    window.addEventListener('resize', resizeTerminal);\n    \n    // Watch for widget size changes (Node-RED dashboard specific)\n    const resizeObserver = new ResizeObserver(entries => {\n        for (let entry of entries) {\n            if (entry.target.id === 'xterm-container') {\n                resizeTerminal();\n            }\n        }\n    });\n    \n    // Observe the container for size changes\n    const container = document.getElementById('xterm-container');\n    if (container) {\n        resizeObserver.observe(container);\n    }\n    \n    // Initial resize when everything is loaded\n    setTimeout(() => {\n        resizeTerminal();\n    }, 200);\n    \n    // Initialize when DOM is ready\n    if (document.readyState === 'loading') {\n        document.addEventListener('DOMContentLoaded', initializeTerminal);\n    } else {\n        initializeTerminal();\n    }\n    \n})(scope);\n</script>\n\n<!-- Load XTerm.js from your installed npm package -->\n<script src=\"/xterm/lib/xterm.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1100,
+        "y": 400,
+        "wires": [
+            [
+                "4a16f19cc78da949"
+            ]
+        ],
+        "icon": "node-red-dashboard/ui_form.png",
+        "info": "# README\n\n## Prerequisites\n\n1. Exit node-red\n2. Install xterm\n\n```bash\ncd ~/.node-red\nnpm install @xterm/xterm\n```\n\n3. Allow xterm to be accessed by node-red frontend system. To do that edit your `settings.js`\n\n```bash\ncd ~/.node-red\nnano settings.js\n```\n\nFind `httpAdminMiddleware`. \n\n> Do not uncomment\n\npaste this below:\n\n```js\nhttpAdminMiddleware: function(req, res, next) {\n    if (req.url.startsWith('/xterm/')) {\n        const path = require('path');\n        const filePath = path.join(__dirname, 'node_modules/@xterm/xterm', req.url.replace('/xterm/', ''));\n        res.sendFile(filePath);\n    } else {\n        next();\n    }\n},\n```\n\n"
+    },
+    {
+        "id": "ab37067f0563473a",
+        "type": "inject",
+        "z": "8f7421acc8b41242",
+        "name": "msg [level: info]",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "level",
+                "v": "info",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 740,
+        "y": 640,
+        "wires": [
+            [
+                "c091688bc3e38506"
+            ]
+        ]
+    },
+    {
+        "id": "8ae588c92923cba6",
+        "type": "inject",
+        "z": "8f7421acc8b41242",
+        "name": "enable log level suffix",
+        "props": [
+            {
+                "p": "showLevels",
+                "v": "true",
+                "vt": "bool"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 720,
+        "y": 400,
+        "wires": [
+            [
+                "c091688bc3e38506"
+            ]
+        ]
+    },
+    {
+        "id": "4c1df57509e330ac",
+        "type": "inject",
+        "z": "8f7421acc8b41242",
+        "name": "disable log level suffix",
+        "props": [
+            {
+                "p": "showLevels",
+                "v": "false",
+                "vt": "bool"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 720,
+        "y": 460,
+        "wires": [
+            [
+                "c091688bc3e38506"
+            ]
+        ]
+    },
+    {
+        "id": "8af43d39b9b0fe13",
+        "type": "inject",
+        "z": "8f7421acc8b41242",
+        "name": "enable time stamp suffix",
+        "props": [
+            {
+                "p": "timestamp",
+                "v": "true",
+                "vt": "bool"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 710,
+        "y": 520,
+        "wires": [
+            [
+                "c091688bc3e38506"
+            ]
+        ]
+    },
+    {
+        "id": "fe1d92d0e1f6b107",
+        "type": "inject",
+        "z": "8f7421acc8b41242",
+        "name": "disable time stamp suffix",
+        "props": [
+            {
+                "p": "timestamp",
+                "v": "false",
+                "vt": "bool"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 710,
+        "y": 580,
+        "wires": [
+            [
+                "c091688bc3e38506"
+            ]
+        ]
+    },
+    {
+        "id": "4a16f19cc78da949",
+        "type": "debug",
+        "z": "8f7421acc8b41242",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1360,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "6116b47f0eb0e8f3",
+        "type": "inject",
+        "z": "8f7421acc8b41242",
+        "name": "msg [level: warn]",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "level",
+                "v": "warn",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 740,
+        "y": 680,
+        "wires": [
+            [
+                "c091688bc3e38506"
+            ]
+        ]
+    },
+    {
+        "id": "e029c0ec7cce117e",
+        "type": "inject",
+        "z": "8f7421acc8b41242",
+        "name": "msg [level: warn]",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "level",
+                "v": "error",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 740,
+        "y": 720,
+        "wires": [
+            [
+                "c091688bc3e38506"
+            ]
+        ]
+    },
+    {
+        "id": "88b9c911d85708fd",
+        "type": "inject",
+        "z": "8f7421acc8b41242",
+        "name": "msg [no level]",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 750,
+        "y": 800,
+        "wires": [
+            [
+                "c091688bc3e38506"
+            ]
+        ]
+    },
+    {
+        "id": "e360ffaab9fd04df",
+        "type": "inject",
+        "z": "8f7421acc8b41242",
+        "name": "msg [level \"white\"]",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "level",
+                "v": "white",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 730,
+        "y": 760,
+        "wires": [
+            [
+                "c091688bc3e38506"
+            ]
+        ]
+    },
+    {
+        "id": "15ee7a46af27a98d",
+        "type": "inject",
+        "z": "8f7421acc8b41242",
+        "name": "msg [array]",
+        "props": [
+            {
+                "p": "level",
+                "v": "white",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 540,
+        "y": 880,
+        "wires": [
+            [
+                "4e044852586c98f7"
+            ]
+        ]
+    },
+    {
+        "id": "4e044852586c98f7",
+        "type": "function",
+        "z": "8f7421acc8b41242",
+        "name": "paylaod array",
+        "func": "msg.payload = [1, 2, 3, 4];\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 880,
+        "wires": [
+            [
+                "c091688bc3e38506"
+            ]
+        ]
+    },
+    {
+        "id": "7a44a8ef28a3e084",
+        "type": "inject",
+        "z": "8f7421acc8b41242",
+        "name": "msg [simple json]",
+        "props": [
+            {
+                "p": "level",
+                "v": "white",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"key1\":\"val1\",\"key2\":\"val2\",\"key3\":\"val3\"}",
+        "payloadType": "json",
+        "x": 740,
+        "y": 920,
+        "wires": [
+            [
+                "c091688bc3e38506"
+            ]
+        ]
+    },
+    {
+        "id": "24731b2e76e47a70",
+        "type": "inject",
+        "z": "8f7421acc8b41242",
+        "name": "msg [simple json]",
+        "props": [
+            {
+                "p": "level",
+                "v": "white",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"key1\":\"val1\",\"key2\":\"val2\",\"key3\":\"val3\"}",
+        "payloadType": "json",
+        "x": 740,
+        "y": 960,
+        "wires": [
+            [
+                "c091688bc3e38506"
+            ]
+        ]
+    }
+]
