@@ -1,5 +1,9 @@
 # README
 
+![alt text](<assets/Screenshot 2025-07-13 at 02.31.46.png>)
+
+![alt text](<assets/Screenshot 2025-07-13 at 02.31.46.gif>)
+
 ## Prerequisites
 
 1. Exit node-red
